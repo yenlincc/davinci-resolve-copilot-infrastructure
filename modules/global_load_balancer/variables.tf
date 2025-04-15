@@ -32,8 +32,3 @@ variable "health_check_port" {
 #   description = "Path to the SSL private key file"
 #   default     = ""
 # }
-
-variable "provider_global" {
-  type        = any
-  description = "The google provider configuration with the 'global' alias"
-}
