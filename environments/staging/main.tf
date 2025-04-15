@@ -22,11 +22,12 @@ module "staging_gke_clusters" {
 
 module "staging_global_load_balancer" {
   source = "../../modules/global_load_balancer"
-  providers = {
-    google = google.global # Explicitly use the global alias
-  }
-  project_id = var.staging_project_id
-  regions    = var.staging_regions
+  #   providers = {
+  #     # google = google.global # Explicitly use the global alias
+  #   }
+  provider_global = provider.google.global
+  project_id      = var.staging_project_id
+  regions         = var.staging_regions
   neg_names_by_region = {
     for region in var.staging_regions : region => "projects/${var.staging_project_id}/regions/${region}/networkEndpointGroups/${var.staging_gke_cluster_name_prefix}-${region}-${module.staging_gke_clusters[region].service_neg_name}"
   }
