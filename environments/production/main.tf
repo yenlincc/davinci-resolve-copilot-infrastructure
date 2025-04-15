@@ -27,6 +27,7 @@ module "prod_global_load_balancer" {
     for region in var.regions : region => "projects/${var.project_id}/regions/${region}/networkEndpointGroups/${var.gke_cluster_name_prefix}-${region}-${module.prod_gke_clusters[region].service_neg_name}"
   }
   health_check_port = var.health_check_port
+  default_region    = var.default_region # Add the default_region variable
 }
 
 # Example Cloud DNS for production

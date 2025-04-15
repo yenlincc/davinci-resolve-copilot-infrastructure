@@ -31,6 +31,7 @@ module "staging_global_load_balancer" {
     for region in var.staging_regions : region => "projects/${var.staging_project_id}/regions/${region}/networkEndpointGroups/${var.staging_gke_cluster_name_prefix}-${region}-${module.staging_gke_clusters[region].service_neg_name}"
   }
   health_check_port = var.staging_health_check_port
+  default_region    = var.staging_default_region # Add the default_region variable
 }
 
 # Example Cloud DNS for staging

@@ -20,6 +20,11 @@ variable "health_check_port" {
   description = "The port for the global load balancer health check"
 }
 
+variable "default_region" {
+  type        = string
+  description = "The default GCP region to use"
+}
+
 # Optional: Variables for SSL certificate
 # variable "ssl_certificate_path" {
 #   type        = string
