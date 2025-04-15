@@ -23,7 +23,7 @@ module "staging_gke_clusters" {
 module "staging_global_load_balancer" {
   source = "../../modules/global_load_balancer"
   providers = {
-    # google = google.global # Explicitly use the global alias
+    google = google.global # Explicitly use the global alias
   }
   project_id = var.staging_project_id
   regions    = var.staging_regions
