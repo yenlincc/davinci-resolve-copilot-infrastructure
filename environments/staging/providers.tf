@@ -45,5 +45,5 @@ alias .global that we defined in our environment's main.tf file.
 provider "google" {
   project = var.staging_project_id
   region  = var.staging_default_region
-  alias   = "global"
+  alias   = "global" # Alias to differentiate global resources
 }

@@ -1,4 +1,11 @@
 # Creates a Cloud DNS managed zone and an A record pointing to the load balancer.
+terraform {
+  required_providers {
+    google = {
+      source = "hashicorp/google"
+    }
+  }
+}
 
 resource "google_dns_managed_zone" "zone" {
   project     = var.project_id

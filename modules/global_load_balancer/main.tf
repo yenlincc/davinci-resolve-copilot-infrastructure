@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+    }
+  }
+}
+
 # Creates the global HTTP(S) load balancer.
 
 resource "google_compute_global_forwarding_rule" "https" {

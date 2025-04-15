@@ -21,7 +21,10 @@ module "staging_gke_clusters" {
 }
 
 module "staging_global_load_balancer" {
-  source     = "../../modules/global_load_balancer"
+  source = "../../modules/global_load_balancer"
+  providers = {
+    google = google.global # Explicitly use the global alias
+  }
   project_id = var.staging_project_id
   regions    = var.staging_regions
   neg_names_by_region = {
@@ -33,6 +36,9 @@ module "staging_global_load_balancer" {
 # Example Cloud DNS for staging
 # module "staging_cloud_dns" {
 #   source = "../../modules/cloud_dns"
+#   providers = {
+#     google = google.global # Explicitly use the global alias
+#   }
 #   project_id = var.staging_project_id
 #   dns_zone_name = var.staging_dns_zone_name
 #   dns_name = var.staging_dns_name
