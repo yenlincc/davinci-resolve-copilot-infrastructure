@@ -3,6 +3,7 @@
 variable "staging_project_id" {
   type        = string
   description = "The ID of your GCP staging project"
+  default     = "dr-copilot-staging"
 }
 
 variable "staging_regions" {

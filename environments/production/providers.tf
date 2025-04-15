@@ -11,3 +11,9 @@ provider "google" {
   project = var.project_id
   region  = var.default_region
 }
+
+provider "google" {
+  project = var.project_id
+  region  = var.default_region
+  alias   = "global" # Alias to differentiate from region-specific resources
+}

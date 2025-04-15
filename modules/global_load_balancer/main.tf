@@ -1,6 +1,7 @@
 # Creates the global HTTP(S) load balancer.
 
 resource "google_compute_global_forwarding_rule" "https" {
+  provider              = google.global
   name                  = "global-https-forwarding-rule"
   project               = var.project_id
   target                = google_compute_target_https_proxy.https.id
@@ -9,9 +10,10 @@ resource "google_compute_global_forwarding_rule" "https" {
 }
 
 resource "google_compute_target_https_proxy" "https" {
-  name    = "global-https-target-proxy"
-  project = var.project_id
-  url_map = google_compute_global_url_map.default.id
+  provider = google.global
+  name     = "global-https-target-proxy"
+  project  = var.project_id
+  url_map  = google_compute_global_url_map.default.id
   # Optional: ssl_certificates = [google_compute_ssl_certificate.default.id]
 }
 
@@ -19,12 +21,14 @@ resource "google_compute_target_https_proxy" "https" {
 # name of the resource provisioned?
 # Also, why is there another name attribute?
 resource "google_compute_global_url_map" "default" {
+  provider        = google.global
   name            = "global-url-map"
   project         = var.project_id
   default_service = google_compute_global_backend_service.default.id
 }
 
 resource "google_compute_global_backend_service" "default" {
+  provider              = google.global
   name                  = "global-backend-service"
   project               = var.project_id
   protocol              = "HTTP" # Or HTTPS if traffic to backends is also secured
