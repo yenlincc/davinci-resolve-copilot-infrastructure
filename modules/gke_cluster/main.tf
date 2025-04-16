@@ -1,5 +1,14 @@
 # Creates the regional GKE Autopilot clusters in private subnets.
 
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+    }
+  }
+}
+
 # TODO: should probably further customize this
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster
 

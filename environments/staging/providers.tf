@@ -1,9 +1,8 @@
 terraform {
   required_providers {
     google = {
-      source                = "hashicorp/google"
-      version               = "~> 6.0"
-      configuration_aliases = [google.global]
+      source  = "hashicorp/google"
+      version = "~> 6.0"
     }
   }
 }
@@ -41,7 +40,7 @@ most resources within that specific region.
 However, since the global load balancer operates outside of any single region,
 we need to explicitly tell Terraform to use the global scope for these
 particular resources. We do this by referencing the google provider with the
-alias .global that we defined in our environment's main.tf file.
+alias .global that we defined in our environment's provider.tf file.
 */
 provider "google" {
   project = var.staging_project_id

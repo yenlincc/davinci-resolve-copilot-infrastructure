@@ -5,6 +5,10 @@ terraform {
     google = {
       source  = "hashicorp/google"
       version = "~> 6.0"
+      # Ref: https://stackoverflow.com/questions/77537323/terraform-required-providers-block-configuration-aliases-argument
+      # when calling this module in particular, you need to
+      # provide the configuration alias it expects below:
+      configuration_aliases = [google.global]
     }
   }
 }

@@ -23,7 +23,12 @@ module "staging_gke_clusters" {
 module "staging_global_load_balancer" {
   source = "../../modules/global_load_balancer"
   providers = {
-    google = google.global # Explicitly use the global alias
+    # Ref: https://stackoverflow.com/questions/77537323/terraform-required-providers-block-configuration-aliases-argument
+    # the left-hand side is the provider name (explicitly declared in
+    # `configuration_aliases`) in the child module (i.e. the module you are
+    # calling) while the right-hand side is the provider configuration in the
+    # root module (the caller module, i.e. this module)
+    google.global = google.global
   }
   project_id = var.staging_project_id
   regions    = var.staging_regions
@@ -38,7 +43,7 @@ module "staging_global_load_balancer" {
 # module "staging_cloud_dns" {
 #   source = "../../modules/cloud_dns"
 #   providers = {
-#     google = google.global # Explicitly use the global alias
+#     google.global = google.global # Explicitly use the global alias
 #   }
 #   project_id = var.staging_project_id
 #   dns_zone_name = var.staging_dns_zone_name
