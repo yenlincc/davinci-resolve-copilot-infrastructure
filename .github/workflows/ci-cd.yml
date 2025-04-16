@@ -2,6 +2,8 @@ name: CI/CD Pipeline
 
 on:
   push:
+    # TODO: fix the triggers. Also have a separate
+    # workflow for PR.
     branches:
       - main
   pull_request:
