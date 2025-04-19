@@ -1,7 +1,7 @@
 ---
 name: TODO
 about: TODO for this project
-title: "[TODO]"
+title: "[TODO] "
 labels: enhancement
 assignees: hencrice
 
