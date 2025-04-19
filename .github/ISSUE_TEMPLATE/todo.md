@@ -4,6 +4,7 @@ about: TODO for this project
 title: "[TODO] "
 labels: enhancement
 assignees: hencrice
+type: Task
 
 ---
 
