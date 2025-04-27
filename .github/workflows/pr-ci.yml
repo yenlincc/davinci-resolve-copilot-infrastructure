@@ -17,19 +17,39 @@ jobs:
   terraform:
     name: validate and plan
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
     strategy:
       matrix:
-        environment: [staging, production]
+        # environment: [staging, production]
+        environment: [staging]
+        workload_identity_provider: [
+            # staging
+            'projects/12313737332/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider',
+            # production
+            'projects/<TBD>/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider'
+        ]
+        exclude:
+          - environment: staging
+            workload_identity_provider: 'projects/<TBD>/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider'
+          - environment: production
+            workload_identity_provider: 'projects/12313737332/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
     
-      - uses: 'google-github-actions/auth@v2'
+      - id: auth
+        name: Setup Google Cloud credentials for ${{ matrix.environment }} 
+        uses: 'google-github-actions/auth@v2'
         with:
-          project_id: 'my-project'
+          project_id: dr-copilot-${{ matrix.environment }}
           workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+          export_environment_variables: true
+          create_credentials_file: true
+          cleanup_credentials: true
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
