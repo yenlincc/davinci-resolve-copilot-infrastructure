@@ -60,27 +60,27 @@ jobs:
         id: fmt
         run: terraform fmt -check
         continue-on-error: false
-        working-directory: ${{ github.event.repository.name }}/environments/${{ matrix.environment }}
+        working-directory: environments/${{ matrix.environment }}
 
       - name: ${{ matrix.environment }} terraform init
         id: init
         run: terraform init
-        working-directory: ${{ github.event.repository.name }}/environments/${{ matrix.environment }}
+        working-directory: environments/${{ matrix.environment }}
 
       - name: ${{ matrix.environment }} terraform validate
         id: validate
         run: terraform validate -no-color
-        working-directory: ${{ github.event.repository.name }}/environments/${{ matrix.environment }}
+        working-directory: environments/${{ matrix.environment }}
       
       - name: ${{ matrix.environment }} terraform test
         id: test
         run: terraform test
-        working-directory: ${{ github.event.repository.name }}/environments/${{ matrix.environment }}
+        working-directory: environments/${{ matrix.environment }}
 
       - name: ${{ matrix.environment }} terraform plan
         id: plan
         run: terraform plan
-        working-directory: ${{ github.event.repository.name }}/environments/${{ matrix.environment }}
+        working-directory: environments/${{ matrix.environment }}
         continue-on-error: true
 
       - uses: actions/github-script@v6
