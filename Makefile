@@ -38,13 +38,16 @@ plan:
 		$(TF_CMD) -chdir=environments/$$env plan -out=$(TF_PLAN); \
 	done
 
-# Destroy Terraform-managed infrastructure for all environments
+.PHONY: plan_staging
+plan_staging:
+	echo "Planning environment staging";
+	$(TF_CMD) -chdir=environments/staging plan -out=$(TF_PLAN);
+
+# Destroy Terraform-managed infrastructure for staging
 .PHONY: destroy
 destroy:
-	@for env in $(ENVIRONMENTS); do \
-		echo "Destroying environment $$env"; \
-		$(TF_CMD) -chdir=environments/$$env destroy; \
-	done
+	echo "Destroying environment staging";
+	$(TF_CMD) -chdir=environments/staging destroy;
 
 # Clean up generated files
 .PHONY: clean
