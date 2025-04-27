@@ -46,7 +46,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           project_id: dr-copilot-${{ matrix.environment }}
-          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+          workload_identity_provider: ${{ matrix.workload_identity_provider }}
           export_environment_variables: true
           create_credentials_file: true
           cleanup_credentials: true
