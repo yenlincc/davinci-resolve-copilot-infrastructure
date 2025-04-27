@@ -28,7 +28,42 @@ module "github-actions-runners-infrastructure" {
       attribute = "attribute.repository/yenlincc/davinci-resolve-copilot-infrastructure"
     }
   }
-  attribute_condition = "assertion.repository_owner=='yenlincc' && assertion.repository_name=='davinci-resolve-copilot-infrastructure'"
+  # ref: https://medium.com/@bbeesley/notes-on-workload-identity-federation-from-github-actions-to-google-cloud-platform-7a818da2c33e
+  #   {
+  #     "actor": "github-bot",
+  #     "actor_id": "123450642",
+  #     "aud": "https://github.com/bbeesley",
+  #     "base_ref": "",
+  #     "enterprise": "bbeesley",
+  #     "environment": "staging",
+  #     "environment_node_id": "EN_kwDOI1Vzn84yRhwA",
+  #     "event_name": "deployment",
+  #     "exp": 1677506298,
+  #     "head_ref": "",
+  #     "iat": 1677505998,
+  #     "iss": "https://token.actions.githubusercontent.com",
+  #     "job_workflow_ref": "bbeesley/gql-federated-graph-explorer/.github/workflows/deployment.yml@d06e49a10fcaf3c8f71f9428949e6fedb9f07b09",
+  #     "job_workflow_sha": "d06e49a10fcaf3c8f71f9428949e6fedb9f07b09",
+  #     "jti": "ef405b0e-5507-4aa6-8685",
+  #     "nbf": 1677505398,
+  #     "ref": "",
+  #     "ref_type": "branch",
+  #     "repository": "bbeesley/gql-federated-graph-explorer",
+  #     "repository_id": "592302719",
+  #     "repository_owner": "bbeesley",
+  #     "repository_owner_id": "21031",
+  #     "repository_visibility": "private",
+  #     "run_attempt": "1",
+  #     "run_id": "4283094502",
+  #     "run_number": "34",
+  #     "runner_environment": "github-hosted",
+  #     "sha": "d06e49a10fcaf3c8f71f9428949e6fedb9f07b09",
+  #     "sub": "repo:bbeesley/gql-federated-graph-explorer:environment:staging",
+  #     "workflow": "Deployment 🚀",
+  #     "workflow_ref": "bbeesley/gql-federated-graph-explorer/.github/workflows/deployment.yml@d06e49a10fcaf3c8f71f9428949e6fedb9f07b09",
+  #     "workflow_sha": "d06e49a10fcaf3c8f71f9428949e6fedb9f07b09"
+  #   }
+  attribute_condition = "assertion.repository=='yenlincc/davinci-resolve-copilot-infrastructure'"
 }
 
 module "github-actions-runners-service" {
@@ -44,5 +79,5 @@ module "github-actions-runners-service" {
       attribute = "attribute.repository/yenlincc/davinci-resolve-copilot-service"
     }
   }
-  attribute_condition = "assertion.repository_owner=='yenlincc' && assertion.repository_name=='davinci-resolve-copilot-service'"
+  attribute_condition = "assertion.repository=='yenlincc/davinci-resolve-copilot-service'"
 }
