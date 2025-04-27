@@ -3,8 +3,8 @@
 # Variables
 TF_CMD = terraform
 TF_PLAN = plan.out
-ENVIRONMENTS = $(shell ls -d environments/*/ | xargs -n 1 basename)
-
+# ENVIRONMENTS = $(shell ls -d environments/*/ | xargs -n 1 basename)
+ENVIRONMENTS = staging
 # Default target
 .PHONY: all
 all: init validate plan
@@ -38,11 +38,6 @@ plan:
 		$(TF_CMD) -chdir=environments/$$env plan -out=$(TF_PLAN); \
 	done
 
-.PHONY: plan_staging
-plan_staging:
-	echo "Planning environment staging";
-	$(TF_CMD) -chdir=environments/staging plan -out=$(TF_PLAN);
-
 # Destroy Terraform-managed infrastructure for staging
 .PHONY: destroy
 destroy:
@@ -55,4 +50,19 @@ clean:
 	@for env in $(ENVIRONMENTS); do \
 		echo "Cleaning up environment $$env"; \
 		rm -f environments/$$env/$(TF_PLAN); \
+	done
+
+# Bootstrap infrastructure to enable CD from GitHub Actions
+.PHONY: bootstrap
+bootstrap:
+	@for env in $(ENVIRONMENTS); do \
+		echo "Bootstrapping environment $$env"; \
+		echo "Running init, environment $$env"; \
+		$(TF_CMD) -chdir=environments/$$env/bootstrap init || exit; \
+		echo "Running validate, environment $$env"; \
+		$(TF_CMD) -chdir=environments/$$env/bootstrap validate || exit; \
+		echo "Running plan, environment $$env"; \
+		$(TF_CMD) -chdir=environments/$$env/bootstrap plan || exit; \
+		echo "Running apply, environment $$env"; \
+		$(TF_CMD) -chdir=environments/$$env/bootstrap apply || exit; \
 	done

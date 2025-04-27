@@ -3,6 +3,7 @@
 variable "project_id" {
   type        = string
   description = "The ID of your GCP production project"
+  default     = "dr-copilot-production"
 }
 
 variable "regions" {
