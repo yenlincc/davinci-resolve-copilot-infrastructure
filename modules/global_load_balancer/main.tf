@@ -91,9 +91,10 @@ resource "google_compute_backend_service" "default" {
   health_checks         = [google_compute_health_check.default.id]
 
   dynamic "backend" {
+    // Ref: https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks
     for_each = var.neg_names_by_region
     content {
-      group = each.value # The self-link of the NEG
+      group = backend.value # The self-link of the NEG
       # TODO: experiment with the balancing mode
       balancing_mode  = "UTILIZATION"
       max_utilization = 0.8

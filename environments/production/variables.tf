@@ -21,7 +21,7 @@ variable "default_region" {
 variable "gke_cluster_name_prefix" {
   type        = string
   description = "Prefix for the names of the production GKE clusters"
-  default     = "prod-gke-cell"
+  default     = "production-gke-cell"
 }
 
 variable "gke_release_channel" {
@@ -33,7 +33,7 @@ variable "gke_release_channel" {
 variable "network_name" {
   type        = string
   description = "The name of the VPC network for production"
-  default     = "prod-cell-vpc"
+  default     = "production-cell-vpc"
 }
 
 variable "subnets_config" {
@@ -63,7 +63,7 @@ variable "health_check_port" {
 variable "service_neg_name" {
   type        = string
   description = "The NEG name used in production GKE Service annotation"
-  default     = "prod-my-service-neg"
+  default     = "production-dr-copilot-neg"
 }
 
 # Example variables for Cloud DNS (uncomment if you are using the module)
