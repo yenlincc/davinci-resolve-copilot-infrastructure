@@ -84,8 +84,9 @@ jobs:
         working-directory: environments/${{ matrix.environment }}
     
       - name: Post PR comment
-        uses: borchero/terraform-plan-comment@v2
+        if: always() && github.ref != 'refs/heads/dev' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
+        uses: robburger/terraform-pr-commenter@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          planfile: plan.out
-          working-directory: environments/${{ matrix.environment }}
+          commenter_type: plan
+          commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+          commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
