@@ -73,7 +73,7 @@ variable "staging_health_check_port" {
 variable "staging_service_neg_name" {
   type        = string
   description = "The NEG name used in staging GKE Service annotation"
-  default     = "staging-my-service-neg"
+  default     = "staging-dr-copilot-neg"
 }
 
 # Example variables for Cloud DNS (uncomment if you are using the module)

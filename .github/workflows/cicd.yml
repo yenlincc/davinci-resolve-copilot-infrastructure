@@ -1,0 +1,142 @@
+# Ref: https://github.com/hashicorp/setup-terraform/tree/v2/
+#
+# This workflow is triggered on pull requests to the dev branch.
+# It runs Terraform commands to validate and plan changes, and comments the results back to the PR.
+# It uses a matrix strategy to run the same steps for both staging and production environments.
+# The workflow also includes a step to comment on the PR with the results of the Terraform commands.
+# The comment includes the outcomes of formatting, initialization, validation, and planning.
+# The comment is updated if it already exists, or created if it doesn't.
+name: CI Pipeline
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+jobs:
+  terraform:
+    name: plan during pull requests and apply on merge
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read        # Required to identify workflow run.
+      checks: write        # Required to add status summary.
+      contents: read       # Required to checkout repository.
+      id-token: write      # Required to authenticate via OIDC.
+      pull-requests: write # Required to add comment and label.
+
+    strategy:
+      matrix:
+        # environment: [staging, production]
+        environment: [staging]
+        workload_identity_provider: [
+            # staging
+            'projects/12313737332/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider',
+            # production
+            'projects/<TBD>/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider'
+        ]
+        exclude:
+          - environment: staging
+            workload_identity_provider: 'projects/<TBD>/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider'
+          - environment: production
+            workload_identity_provider: 'projects/12313737332/locations/global/workloadIdentityPools/infrastructure-pool/providers/infrastructure-provider'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - id: auth
+        name: Setup Google Cloud credentials for ${{ matrix.environment }}
+        uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: dr-copilot-${{ matrix.environment }}
+          workload_identity_provider: ${{ matrix.workload_identity_provider }}
+          export_environment_variables: true
+          create_credentials_file: true
+          cleanup_credentials: true
+
+      - name: Create cache
+        run: |
+          mkdir --parents $HOME/.terraform.d/plugin-cache
+          echo "TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache" >> $GITHUB_ENV
+
+      - name: Cache Terraform
+        uses: actions/cache@v4
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: cache-tf-${{ runner.os }}-${{ hashFiles(format('environments/{0}/.terraform.lock.hcl', matrix.environment)) }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+            # install the latest 1.11.x version of terraform
+            terraform_version: ~1.11.0
+            # (optional) Whether to install a wrapper to wrap subsequent calls
+            # of the terraform binary and expose its STDOUT, STDERR, and exit
+            # code as outputs named stdout, stderr, and exitcode respectively.
+            terraform_wrapper: false
+
+      - name: ${{ matrix.environment }} terraform init
+        id: tf
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: op5dev/tf-via-pr@v13
+        with:
+          working-directory: environments/${{ matrix.environment }}
+          command: init
+          arg-lock: false
+          format: true
+          validate: true
+
+      - name: Setup TFLint
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_wrapper: true
+
+      - name: Run TFLint
+        id: tflint
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: environments/${{ matrix.environment }}
+        run: |
+          tflint --init
+          tflint --format compact
+        continue-on-error: true
+      
+      - name: Comment if TFLint errors
+        if: ${{ github.event_name == 'pull_request' && steps.tflint.outputs.exitcode != 0 }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Compose TFLint output.
+          tflint='${{ steps.tflint.outputs.stderr || steps.tflint.outputs.stdout }}'
+          tflint="<details><summary>TFLint error.</summary>
+
+          \`\`\`hcl
+          $(echo "$tflint" | sed 's/`/\\`/g')
+          \`\`\`
+          </details>"
+
+          # Get body of PR comment from tf step output.
+          comment=$(gh api /repos/{owner}/{repo}/issues/comments/${{ steps.tf.outputs.comment-id }} --method GET --jq '.body')
+
+          # Replace placeholder with TFLint output.
+          comment="${comment//<!-- placeholder-2 -->/$tflint}"
+
+          # Update PR comment combined with TFLint output.
+          gh api /repos/{owner}/{repo}/issues/comments/${{ steps.tf.outputs.comment-id }} --method PATCH --field body="$comment"
+
+          # Exit workflow due to TFLint error.
+          exit 1
+
+      - name: ${{ matrix.environment }} terraform test
+        if: ${{ github.event_name == 'pull_request' }}
+        run: terraform test
+        working-directory: environments/${{ matrix.environment }}
+
+      - name: ${{ matrix.environment }} terraform ${{ github.event_name == 'push' && 'apply' || 'plan' }}
+        # if push, run terraform apply, else run terraform plan
+        uses: op5dev/tf-via-pr@v13
+        with:
+          working-directory: environments/${{ matrix.environment }}
+          command: ${{ github.event_name == 'push' && 'apply' || 'plan' }}
+          arg-lock: ${{ github.event_name == 'push' }}

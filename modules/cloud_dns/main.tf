@@ -1,6 +1,20 @@
 # Creates a Cloud DNS managed zone and an A record pointing to the load balancer.
 
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+      # Ref: https://stackoverflow.com/questions/77537323/terraform-required-providers-block-configuration-aliases-argument
+      # when calling this module in particular, you need to
+      # provide the configuration alias it expects below:
+      configuration_aliases = [google.global]
+    }
+  }
+}
+
 resource "google_dns_managed_zone" "zone" {
+  provider    = google.global # Explicitly use the global provider
   project     = var.project_id
   name        = var.dns_zone_name
   dns_name    = "${var.dns_name}." # Ensure the trailing dot
@@ -9,6 +23,7 @@ resource "google_dns_managed_zone" "zone" {
 }
 
 resource "google_dns_record_set" "lb_a_record" {
+  provider     = google.global # Explicitly use the global provider
   project      = var.project_id
   managed_zone = google_dns_managed_zone.zone.name
   name         = var.dns_name

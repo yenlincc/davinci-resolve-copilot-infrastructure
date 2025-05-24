@@ -21,18 +21,30 @@ module "staging_gke_clusters" {
 }
 
 module "staging_global_load_balancer" {
-  source     = "../../modules/global_load_balancer"
+  source = "../../modules/global_load_balancer"
+  providers = {
+    # Ref: https://stackoverflow.com/questions/77537323/terraform-required-providers-block-configuration-aliases-argument
+    # the left-hand side is the provider name (explicitly declared in
+    # `configuration_aliases`) in the child module (i.e. the module you are
+    # calling) while the right-hand side is the provider configuration in the
+    # root module (the caller module, i.e. this module)
+    google.global = google.global
+  }
   project_id = var.staging_project_id
   regions    = var.staging_regions
   neg_names_by_region = {
     for region in var.staging_regions : region => "projects/${var.staging_project_id}/regions/${region}/networkEndpointGroups/${var.staging_gke_cluster_name_prefix}-${region}-${module.staging_gke_clusters[region].service_neg_name}"
   }
   health_check_port = var.staging_health_check_port
+  default_region    = var.staging_default_region # Add the default_region variable
 }
 
 # Example Cloud DNS for staging
 # module "staging_cloud_dns" {
 #   source = "../../modules/cloud_dns"
+#   providers = {
+#     google.global = google.global # Explicitly use the global alias
+#   }
 #   project_id = var.staging_project_id
 #   dns_zone_name = var.staging_dns_zone_name
 #   dns_name = var.staging_dns_name

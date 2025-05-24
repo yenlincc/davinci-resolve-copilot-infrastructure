@@ -10,6 +10,15 @@
 # addresses to reach Google Cloud APIs and services using the internal IP addresses of
 # the subnet. Traffic stays within Google's network).
 
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+    }
+  }
+}
+
 resource "google_compute_network" "vpc_network" {
   project                 = var.project_id
   name                    = var.network_name
